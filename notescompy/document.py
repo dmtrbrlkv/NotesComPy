@@ -1,6 +1,7 @@
-from . import handle, collection, database, session
-import datetime
-import pywintypes
+from . import handle, collection, database, utils
+from collections.abc import Iterable
+import json
+
 
 class Document(handle.NotesHandle):
     def __init__(self, handle):
@@ -16,7 +17,7 @@ class Document(handle.NotesHandle):
 
     @property
     def Items(self):
-        pass
+        return self.handle.Items
 
     @property
     def NoteID(self):
@@ -57,9 +58,11 @@ class Document(handle.NotesHandle):
         pass
 
     def GetItemValue(self, field_name, as_text=False, sep=", "):
-        values = [self._convert_value(v) for v in self.handle.GetItemValue(field_name)]
+        values = [utils.convert_item_value(v) for v in self.handle.GetItemValue(field_name)]
         if not as_text:
             return values
+
+        values = [utils.item_value_to_str(v) for v in values]
         return sep.join(values)
 
 
@@ -67,35 +70,13 @@ class Document(handle.NotesHandle):
     # Remove
     # RemoveItem
 
-    @classmethod
-    def _convert_value(cls, value):
-        if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
-            ndt = session.Session().CreateDateTime(value.isoformat())
-            ndt.SetAnyTime()
-            v = ndt
-        elif isinstance(value, datetime.time):
-            ndt = session.Session().CreateDateTime(value.isoformat())
-            ndt.SetAnyDate()
-            v = ndt
-        # elif isinstance(value, pywintypes.datetime):
-        #     v = datetime.datetime(
-        #         year=value.year,
-        #         month=value.month,
-        #         day=value.day,
-        #         hour=value.hour,
-        #         minute=value.minute,
-        #         second=value.second
-        #     )
-        else:
-            v = value
 
-        return v
 
     def ReplaceItemValue(self, field_name, value):
         if isinstance(value, (list, tuple, set)):
-            values = [self._convert_value(v) for v in value]
+            values = [utils.convert_item_value(v) for v in value]
         else:
-            values = self._convert_value(value)
+            values = utils.convert_item_value(value)
 
         item_handle = self.handle.ReplaceItemValue(field_name, values)
 
@@ -103,5 +84,37 @@ class Document(handle.NotesHandle):
         return item_handle
 
 
-    # Save
+    def Save(self, force=True, createResponse =False, markRead=False):
+        return self.handle.Save(force, createResponse, markRead)
 
+    def GetValues(self, fields=None, properties=None, formulas=None, formulas_names=None, as_text=False, sep=", "):
+        res = {}
+
+        if fields is None and properties is None and formulas is None:
+            fields = []
+            for item in self.Items:
+                fields.append(item.Name)
+            properties = ["UniversalId", "Created"]
+
+        if fields:
+            for field in fields if not isinstance(fields, str) and isinstance(fields, Iterable) else [fields]:
+                res[field] = self.GetItemValue(field, as_text, sep)
+
+        if properties:
+            for prop in properties if not isinstance(properties, str) and isinstance(properties, Iterable) else [properties]:
+                value = getattr(self, prop)
+                if as_text:
+                    value = utils.item_value_to_str(value)
+                res[prop] = value
+
+        if formulas:
+            if formulas_names is None:
+                formulas_names = formulas
+            for formula, name in zip(formulas, formulas_names) if not isinstance(formulas, str) and isinstance(formulas, Iterable) else zip([formulas], [formulas_names]):
+                res[name] = utils.evaluate(formula, self.handle, as_text, sep)
+
+        return res
+
+    def toJSON(self, fields=None, properties=None, formulas=None, formulas_names=None, as_text=False, sep=", ", default=str, sort_keys=True, indent=4):
+        values = self.GetValues(fields, properties, formulas, formulas_names, as_text, sep)
+        return json.dumps(values, default=default, sort_keys=sort_keys, indent=indent)

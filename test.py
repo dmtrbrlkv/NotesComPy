@@ -76,6 +76,23 @@ for doc in v.GetAllDocumentsByKey(keys):
     value = doc.GetItemValue("testField9")
     value = doc.GetItemValue("testField10")
 
+    value = doc.GetItemValue("testField1", True)
+    value = doc.GetItemValue("testField2", True)
+    value = doc.GetItemValue("testField3", True)
+    value = doc.GetItemValue("testField4", True)
+    value = doc.GetItemValue("testField5", True)
+    value = doc.GetItemValue("testField6", True)
+    value = doc.GetItemValue("testField7", True)
+    value = doc.GetItemValue("testField8", True)
+    value = doc.GetItemValue("testField9", True)
+    value = doc.GetItemValue("testField10", True)
+
+    values = doc.GetValues(["testField1", "testField7"], ["Size", "UniversalId", "NoteId"], ["@LowerCase(form)"])
+    values = doc.GetValues(["testField1", "testField7"], ["Size", "UniversalId", "NoteId"], ["@LowerCase(form)", "@UpperCase(form)"], ["форма", "ФОРМА"], as_text=True)
+    values = doc.GetValues("testField7", None, "@UpperCase(form)", "Форма", as_text=True)
+
+
+    json = doc.toJSON(as_text=True)
     doc.Save(True, False)
 
 print()
