@@ -40,8 +40,12 @@ for doc in v:
     print(f"name = {name}")
 
 
+json = v.toJSON()
 
 v = db.get_view('testForm')
+
+json = v.toJSON()
+
 autoupdate = v.AutoUpdate
 v.AutoUpdate = False
 
@@ -105,6 +109,10 @@ for doc in v.GetAllDocumentsByKey("testform"):
 
     print(f"name = {form}, unid = {unid}")
 
+
+col = v.GetAllDocumentsByKey(keys)
+json = col.toJSON()
+json = col.toJSON(formulas=v, formulas_names=v)
 
 print(s.username)
 print(s.ServerName)

@@ -1,4 +1,4 @@
-from . import handle, collection, database, utils
+from . import handle, collection, database, utils, view
 from collections.abc import Iterable
 import json
 
@@ -107,9 +107,16 @@ class Document(handle.NotesHandle):
                     value = utils.item_value_to_str(value)
                 res[prop] = value
 
+        if isinstance(formulas_names, view.View):
+            formulas_names = formulas_names.titles
+
         if formulas:
             if formulas_names is None:
                 formulas_names = formulas
+
+            if isinstance(formulas, view.View):
+                formulas = formulas.formulas
+
             for formula, name in zip(formulas, formulas_names) if not isinstance(formulas, str) and isinstance(formulas, Iterable) else zip([formulas], [formulas_names]):
                 res[name] = utils.evaluate(formula, self.handle, as_text, sep)
 
