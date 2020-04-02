@@ -1,6 +1,3 @@
-from .document import Document
-
-
 class IterDocMixin:
     def __init__(self):
         self._current_doc = None
@@ -20,6 +17,8 @@ class IterDocMixin:
         return self
 
     def __next__(self):
+        from .document import Document
+
         if not self._current_doc:
             doc_handle = self.handle.getFirstDocument()
         else:

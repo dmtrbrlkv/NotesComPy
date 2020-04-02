@@ -1,4 +1,4 @@
-from .handle import _NotesHandle
+from . import handle
 import win32com.client
 
 
@@ -17,7 +17,7 @@ class SingletonMeta(type):
         return cls._instance
 
 
-class Session(_NotesHandle, metaclass=SingletonMeta):
+class Session(handle.NotesHandle, metaclass=SingletonMeta):
     is_init = False
 
     def __init__(self, password=None, session_type=SessionType.LotusNotesSession):

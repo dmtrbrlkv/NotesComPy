@@ -1,23 +1,20 @@
-from .handle import _NotesHandle
-from ._iterdoc import IterDocMixin
-from .collection import DocumentCollection
-from .document import Document
+from . import handle, iterdoc, document, collection
 
 
-class View(_NotesHandle, IterDocMixin):
+class View(handle.NotesHandle, iterdoc.IterDocMixin):
     def __init__(self, handle):
         super().__init__(handle)
-        super(IterDocMixin).__init__()
+        super(iterdoc.IterDocMixin).__init__()
 
     def get_all_documents_by_key(self, keys, exact_match=False):
         col_handle = self.handle.GetAllDocumentsByKey(keys, exact_match)
-        return DocumentCollection(col_handle)
+        return collection.DocumentCollection(col_handle)
     GetAllDocumentsByKey = get_all_documents_by_key
 
     def get_document_by_key(self, keys, exact_match=False):
         doc_handle = self.handle.GetDocumentByKey(keys, exact_match)
         if doc_handle:
-            return Document(doc_handle)
+            return document.Document(doc_handle)
         else:
             return None
     GetDocumentByKey = get_document_by_key

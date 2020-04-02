@@ -1,4 +1,4 @@
-class _NotesHandle:
+class NotesHandle:
     def __init__(self, handle):
         self.handle = handle
 
