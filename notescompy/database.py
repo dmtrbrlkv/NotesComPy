@@ -1,23 +1,31 @@
 from .handle import _NotesHandle
 from .session import Session
 from .document import Document
+from .collection import DocumentCollection
 from .view import View
 import win32com.client
 
 
 class Database(_NotesHandle):
-    def __init__(self, server, filepath):
-        super().__init__()
+    def __init__(self, handle):
+        super().__init__(handle)
+
+
+    @classmethod
+    def OpenDatabase(cls, server, filepath):
         if not Session.is_init:
             raise RuntimeError("Session not initialized")
 
         session_handle = Session().handle
-        self.handle = session_handle.GetDatabase(server, filepath)
+        handle = session_handle.GetDatabase(server, filepath)
+        return Database(handle)
 
-    # @property
-    # def all_documents(self):
-    #     pass
-    # AllDocuments = all_documents
+
+    @property
+    def all_documents(self):
+        col_handle = self.handle.AllDocuments
+        return DocumentCollection(col_handle)
+    AllDocuments = all_documents
 
     @property
     def file_name(self):

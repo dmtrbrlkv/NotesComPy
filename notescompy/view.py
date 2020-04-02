@@ -1,20 +1,49 @@
 from .handle import _NotesHandle
+from ._iterdoc import IterDocMixin
+from .collection import DocumentCollection
 from .document import Document
 
 
-class View(_NotesHandle):
+class View(_NotesHandle, IterDocMixin):
     def __init__(self, handle):
-        super().__init__()
-        self.handle = handle
-        self.current_doc = None
+        super().__init__(handle)
+        super(IterDocMixin).__init__()
 
-    def get_first_document(self):
-        doc_handle = self.handle.getFirstDocument()
-        self.current_doc = Document(doc_handle)
+    def get_all_documents_by_key(self, keys, exact_match=False):
+        col_handle = self.handle.GetAllDocumentsByKey(keys, exact_match)
+        return DocumentCollection(col_handle)
+    GetAllDocumentsByKey = get_all_documents_by_key
 
-    def get_next_document(self):
-        if self.current_doc is None:
-            raise ValueError("Current doc not set")
+    def get_document_by_key(self, keys, exact_match=False):
+        doc_handle = self.handle.GetDocumentByKey(keys, exact_match)
+        if doc_handle:
+            return Document(doc_handle)
+        else:
+            return None
+    GetDocumentByKey = get_document_by_key
 
-        doc_handle = self.handle.getNextDocument(self.current_doc.handle)
-        self.current_doc = Document(doc_handle)
+
+    @property
+    def auto_update(self):
+        return self.handle.AutoUpdate
+
+    @auto_update.setter
+    def auto_update(self, value):
+        self.handle.AutoUpdate = value
+    AutoUpdate = auto_update
+
+
+    @property
+    def entry_count(self):
+        return self.handle.EntryCount
+    EntryCount = entry_count
+
+    @property
+    def name(self):
+        return self.handle.Name
+    Name = name
+
+
+    def __str__(self):
+        return f"View {self.name}, {self.entry_count} entries"
+

@@ -1,6 +1,6 @@
 class _NotesHandle:
-    def __init__(self):
-        self.handle = None
+    def __init__(self, handle):
+        self.handle = handle
 
     @property
     def handle(self):

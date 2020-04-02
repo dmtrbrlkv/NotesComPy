@@ -21,7 +21,7 @@ class Session(_NotesHandle, metaclass=SingletonMeta):
     is_init = False
 
     def __init__(self, password=None, session_type=SessionType.LotusNotesSession):
-        super().__init__()
+        super().__init__(None)
         self.session_type = session_type
 
         if session_type not in SessionType.Types:
