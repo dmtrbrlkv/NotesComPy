@@ -7,7 +7,11 @@ class DocumentCollection(handle.NotesHandle, iterdoc.IterDocMixin):
         super(iterdoc.IterDocMixin).__init__()
 
     def __str__(self):
-        return f"{self.handle.Count} documents from {self.handle.ParentDatabase.FilePath}"
+        return f"{self.count} documents from {self.handle.ParentDatabase.FilePath}"
+
+    @property
+    def count(self):
+        return self.handle.Count
 
     def GetValues(self, fields=None, properties=None, formulas=None, formulas_names=None, no_list=False, sep=None):
         res = {}

@@ -1,13 +1,14 @@
 from . import handle, collection, database, utils, view
 from collections.abc import Iterable
-
+import random
 
 class Document(handle.NotesHandle):
     def __init__(self, handle):
         super().__init__(handle)
+        self.backup = None
 
     def __str__(self):
-        return f"{self.handle.UniversalId} {self.handle.ParentDatabase.FilePath}"
+        return f"{self.handle.UniversalId} {self.GetItemValue0('Form')} {self.handle.ParentDatabase.FilePath}"
 
     @property
     def is_response(self):
@@ -79,6 +80,7 @@ class Document(handle.NotesHandle):
         return self.handle.HasItem(itemName)
 
     def Remove(self, force=True):
+        raise ValueError("Cant remove")
         return self.handle.Remove(force)
 
     def RemoveItem(self, itemName):
@@ -96,6 +98,9 @@ class Document(handle.NotesHandle):
         return item_handle
 
     def Save(self, force=True, createResponse=False, markRead=False):
+        if random.randint(1, 5) == 1:
+            raise ValueError("Random Save Error")
+
         return self.handle.Save(force, createResponse, markRead)
 
     def GetValues(self, fields=None, properties=None, formulas=None, formulas_names=None, no_list=False, sep=None):
@@ -141,8 +146,43 @@ class Document(handle.NotesHandle):
         values = self.GetValues(fields, properties, formulas, formulas_names, no_list, sep)
         utils.save_to_json(values, fp, default, sort_keys, indent)
 
-
     def GetValuesT(self, fields):
         return tuple(zip(*[self.GetItemValue(field) for field in fields]))
+
+    def copy(self, db=None, from_disk=False):
+        if db is None:
+            db = self.ParentDatabase
+
+        copy_doc = db.create_document()
+        if from_disk:
+            from_disk_doc = db.get_document_by_unid(self.UniversalID)
+            from_disk_doc.CopyAllItems(copy_doc)
+        else:
+            self.CopyAllItems(copy_doc)
+        return copy_doc
+
+    @property
+    def IsNewNote(self):
+        return self.handle.IsNewNote
+
+    @property
+    def has_backup(self):
+        if self.backup is None:
+            return False
+        return True
+
+    def create_backup(self):
+        if not self.IsNewNote:
+            backup = self.copy(from_disk=True)
+            self.backup = backup
+            return backup
+
+    def restore_backup(self):
+        if not self.has_backup:
+            raise ValueError("Backup not created")
+
+        backup = self.backup
+        backup.CopyAllItems(self, True)
+
 
 

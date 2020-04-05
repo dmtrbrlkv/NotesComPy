@@ -81,6 +81,9 @@ class Database(handle.NotesHandle):
         col_handle = self.handle.search(formula, notesDateTime, maxDocs)
         return collection.DocumentCollection(col_handle)
 
+    def create_document(self):
+        return document.Document(self.handle.CreateDocument())
+
 
     def __str__(self):
         return f"{self.title} ({self.server} {self.file_path})" if self.is_open else "Not open"

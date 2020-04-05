@@ -1,4 +1,4 @@
-from notescompy import session, database, document, view
+from notescompy import session, database, document, view, custom_collection
 from notescompy.utils import evaluate
 import time, datetime
 
@@ -6,6 +6,7 @@ import time, datetime
 def update_person(doc):
     unid = doc.GetItemValue0("unid")
     db = doc.ParentDatabase
+    cc = custom_collection.CustomCollection(True)
 
     if doc.GetItemValue0("Form") == "Language":
         view = db.get_view("srchPersonsByLanguage")
@@ -29,9 +30,13 @@ def update_person(doc):
             else:
                 field_value.append(field_v)
 
-        person_doc.ReplaceItemValue(field_name, field_value)
-        person_doc.Save()
+        if field_value != person_doc.GetItemValue(field_name):
+            person_doc.ReplaceItemValue(field_name, field_value)
+            cc.append(person_doc)
 
+    cc.save()
+
+    return cc.to_json("UNID")
 
 s = session.Session("bdoolo87")
 print(s.UserName)
@@ -98,7 +103,7 @@ status = agent.Run(doc)
 
 doc.ReplaceItemValue("Name", "Python2")
 doc.Save()
-update_person(doc)
+# print(update_person(doc))
 
 
 url = doc.notes_property.NotesUrl
@@ -113,3 +118,35 @@ v.save_to_json("view.json")
 col = db.search("@contains(FullName; 'John')")
 col.save_to_json("col_search.json", formulas=v, formulas_names=v)
 
+
+cc = custom_collection.CustomCollection()
+
+cc.append(v)
+cc.append(col)
+cc.append(doc)
+
+for doc in cc:
+    print(doc.GetValuesT(["Form", "UNID"]))
+
+cc.append(db.create_document())
+cc.stamp_all("test1", "ok")
+# cc.save()
+
+
+cc = custom_collection.CustomCollection(True)
+
+cc.append(v)
+cc.append(col)
+cc.append(doc)
+
+for doc in cc:
+    print(doc.GetValuesT(["Form", "UNID"]))
+
+
+cc.save_to_json("custom.json", ["Form", "UNID"])
+
+
+cc = custom_collection.CustomCollection()
+cc.append(db.create_document())
+cc.append(db.create_document())
+cc.save()
