@@ -1,4 +1,4 @@
-from . import handle, session, view, document, collection
+from . import handle, session, view, document, collection, agent, const
 
 
 class Database(handle.NotesHandle):
@@ -71,6 +71,15 @@ class Database(handle.NotesHandle):
         return view.View(view_handle)
 
     GetView = get_view
+
+
+    def get_agent(self, agent_name):
+        agent_handle = self.handle.GetAgent(agent_name)
+        return agent.Agent(agent_handle)
+
+    def search(self, formula, notesDateTime=const.nothing, maxDocs=0):
+        col_handle = self.handle.search(formula, notesDateTime, maxDocs)
+        return collection.DocumentCollection(col_handle)
 
 
     def __str__(self):

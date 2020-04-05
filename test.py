@@ -1,119 +1,115 @@
-from notescompy import session, database
+from notescompy import session, database, document, view
 from notescompy.utils import evaluate
 import time, datetime
 
+
+def update_person(doc):
+    unid = doc.GetItemValue0("unid")
+    db = doc.ParentDatabase
+
+    if doc.GetItemValue0("Form") == "Language":
+        view = db.get_view("srchPersonsByLanguage")
+        field_name = "Languages"
+        field_unid_name = "LanguagesUNID"
+        new_value = doc.GetItemValue0("Name")
+    elif doc.GetItemValue0("Form") == "Level":
+        view = db.get_view("srchPersonsByLevel")
+        field_name = "Level"
+        field_unid_name = "LevelUNID"
+        new_value = doc.GetItemValue0("Level")
+    else:
+        return
+
+    for person_doc in view.GetAllDocumentsByKey(unid):
+        field_value = []
+
+        for field_v, field_unid in person_doc.GetValuesT([field_name, field_unid_name]):
+            if field_unid == unid:
+                field_value.append(new_value)
+            else:
+                field_value.append(field_v)
+
+        person_doc.ReplaceItemValue(field_name, field_value)
+        person_doc.Save()
+
+
 s = session.Session("bdoolo87")
 print(s.UserName)
-print(s.isonserver)
+print(s.notes_property.isonserver)
 
-db = database.Database.OpenDatabase('PyLN', 'names.nsf')
-
-alldocs = db.AllDocuments
-doc = alldocs.GetFirstDocument()
-unid = doc.universalid
-
-doc = db.get_document_by_unid(unid)
-print(doc)
-
+db = database.Database.OpenDatabase('PyLN', 'itcrowd.nsf')
 print(db)
 
 all_docs = db.AllDocuments
 for doc in all_docs:
-    form, unid = doc.getitemvalue('Form')[0], doc.universalid
+    form, unid = doc.GetItemValue('Form')[0], doc.UniversalID
     print(f"name = {form}, unid = {unid}")
 
-v = db.get_view('people')
+v = db.get_view('Persons')
 doc = v.get_first_document()
 while doc:
-    name = doc.getitemvalue('LastName')[0]
+    name = doc.GetItemValue('FullName')[0]
     print(f"name = {name}")
     doc = v.get_next_document()
 
 
 for doc in v:
-    name = doc.getitemvalue('LastName')[0]
+    name = doc.GetItemValue('FullName')[0]
     print(f"name = {name}")
 
 
-for doc in v:
-    name = doc.getitemvalue('LastName')[0]
-    print(f"name = {name}")
+json = v.to_json()
 
+v = db.get_view('Persons\\By level')
 
-json = v.toJSON()
-
-v = db.get_view('testForm')
-
-json = v.toJSON()
+json = v.to_json()
 
 autoupdate = v.AutoUpdate
 v.AutoUpdate = False
 
-keys = ["testform", "AGENT"]
-keys = evaluate("'testform':'AGENT'")
+v.notes_property.AutoUpdate = True
+autoupdate = v.AutoUpdate
+
+keys = ["Senior"]
 for doc in v.GetAllDocumentsByKey(keys):
-    form, unid = doc.GetItemValue('Form')[0], doc.universalid
-    v = evaluate("@DocumentUniqueId", doc)
-    resp_col = doc.Responses
-    print(f"Responses = {resp_col.count}")
-    print(f"name = {form}, unid = {unid}")
-
-    doc.ReplaceItemValue("testField1", "42")
-    doc.ReplaceItemValue("testField2", 42)
-    doc.ReplaceItemValue("testField3", 42.53)
-    doc.ReplaceItemValue("testField4", time.time())
-    doc.ReplaceItemValue("testField5", datetime.datetime.today())
-    doc.ReplaceItemValue("testField6", datetime.date.fromisoformat("2020-03-23"))
-    doc.ReplaceItemValue("testField7", datetime.datetime.now())
-    doc.ReplaceItemValue("testField8", ["1", "2", "3"])
-    doc.ReplaceItemValue("testField9", [datetime.datetime.now(), datetime.datetime.now(), datetime.datetime.now()])
-    doc.ReplaceItemValue("testField10", datetime.time.fromisoformat("12:00"))
-
-    value = doc.GetItemValue("testField1")
-    value = doc.GetItemValue("testField2")
-    value = doc.GetItemValue("testField3")
-    value = doc.GetItemValue("testField4")
-    value = doc.GetItemValue("testField5")
-    value = doc.GetItemValue("testField6")
-    value = doc.GetItemValue("testField7")
-    value = doc.GetItemValue("testField8")
-    value = doc.GetItemValue("testField9")
-    value = doc.GetItemValue("testField10")
-
-    value = doc.GetItemValue("testField1", True)
-    value = doc.GetItemValue("testField2", True)
-    value = doc.GetItemValue("testField3", True)
-    value = doc.GetItemValue("testField4", True)
-    value = doc.GetItemValue("testField5", True)
-    value = doc.GetItemValue("testField6", True)
-    value = doc.GetItemValue("testField7", True)
-    value = doc.GetItemValue("testField8", True)
-    value = doc.GetItemValue("testField9", True)
-    value = doc.GetItemValue("testField10", True)
-
-    values = doc.GetValues(["testField1", "testField7"], ["Size", "UniversalId", "NoteId"], ["@LowerCase(form)"])
-    values = doc.GetValues(["testField1", "testField7"], ["Size", "UniversalId", "NoteId"], ["@LowerCase(form)", "@UpperCase(form)"], ["форма", "ФОРМА"], as_text=True)
-    values = doc.GetValues("testField7", None, "@UpperCase(form)", "Форма", as_text=True)
-
-
-    json = doc.toJSON(as_text=True)
-    doc.Save(True, False)
+    json = doc.to_json(sep=", ")
 
 print()
 
-v = db.get_view('testForm')
-keys = ["testform", "AGENT"]
-for doc in v.GetAllDocumentsByKey("testform"):
-    form, unid = doc.getitemvalue('Form')[0], doc.universalid
-    f = doc.GetItemValue("form", True)
-
-    print(f"name = {form}, unid = {unid}")
-
+json = v.GetAllDocumentsByKey(keys).to_json(no_list=True)
 
 col = v.GetAllDocumentsByKey(keys)
-json = col.toJSON()
-json = col.toJSON(formulas=v, formulas_names=v)
+json = col.to_json()
+print(json)
+
+json = col.to_json(formulas=v, formulas_names=v)
+print(json)
 
 print(s.username)
-print(s.ServerName)
+print(s.notes_property.ServerName)
 print(s)
+
+doc = db.get_document_by_unid("3F1B416909DE674043258541003445AA")
+doc.ReplaceItemValue("Name", "Python")
+doc.Save()
+
+agent = db.get_agent("UpdatePerson")
+status = agent.Run(doc)
+
+doc.ReplaceItemValue("Name", "Python2")
+doc.Save()
+update_person(doc)
+
+
+url = doc.notes_property.NotesUrl
+f_save = doc.notes_property.Save
+f_save(True, False)
+
+doc.save_to_json("doc.json")
+col.save_to_json("col.json")
+v = db.get_view("Persons\\By language")
+v.save_to_json("view.json")
+
+col = db.search("@contains(FullName; 'John')")
+col.save_to_json("col_search.json", formulas=v, formulas_names=v)
+

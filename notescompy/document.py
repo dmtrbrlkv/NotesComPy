@@ -1,6 +1,5 @@
 from . import handle, collection, database, utils, view
 from collections.abc import Iterable
-import json
 
 
 class Document(handle.NotesHandle):
@@ -43,34 +42,47 @@ class Document(handle.NotesHandle):
 
     @property
     def UniversalID(self):
-        return self.handle.UniveralID
+        return self.handle.UniversalID
 
-    def ComputeWithForm(self):
-        pass
+    def ComputeWithForm(self, doDataTypes=False, raiseError=False):
+        return self.handle.ComputeWithForm(doDataTypes, raiseError)
 
-    def CopyAllItems(self):
-        pass
+    def CopyAllItems(self, doc, replace=False):
+        if isinstance(doc, Document):
+            return self.handle.CopyAllItems(doc.handle, replace)
+        else:
+            return self.handle.CopyAllItems(doc, replace)
 
-    def CopyItem(self):
-        pass
+    def CopyToDatabase(self, db):
+        if isinstance(db, database.Database):
+            new_doc_handle = self.handle.CopyToDatabase(db.handle)
+        else:
+            new_doc_handle = self.handle.CopyToDatabase(db)
 
-    def CopyToDatabase(self):
-        pass
+        return Document(new_doc_handle)
 
-    def GetItemValue(self, field_name, as_text=False, sep=", "):
+    def GetItemValue(self, field_name, no_list=False, sep=None):
         values = [utils.convert_item_value(v) for v in self.handle.GetItemValue(field_name)]
-        if not as_text:
+
+        if sep is None:
+            if no_list and len(values) == 1:
+                values = values[0]
             return values
 
         values = [utils.item_value_to_str(v) for v in values]
         return sep.join(values)
 
+    def GetItemValue0(self, field_name):
+        return self.GetItemValue(field_name)[0]
 
-    # HasItem
-    # Remove
-    # RemoveItem
+    def HasItem(self, itemName):
+        return self.handle.HasItem(itemName)
 
+    def Remove(self, force=True):
+        return self.handle.Remove(force)
 
+    def RemoveItem(self, itemName):
+        self.handle.RemoveItem(itemName)
 
     def ReplaceItemValue(self, field_name, value):
         if isinstance(value, (list, tuple, set)):
@@ -83,11 +95,10 @@ class Document(handle.NotesHandle):
         # TODO Return Item class instance
         return item_handle
 
-
-    def Save(self, force=True, createResponse =False, markRead=False):
+    def Save(self, force=True, createResponse=False, markRead=False):
         return self.handle.Save(force, createResponse, markRead)
 
-    def GetValues(self, fields=None, properties=None, formulas=None, formulas_names=None, as_text=False, sep=", "):
+    def GetValues(self, fields=None, properties=None, formulas=None, formulas_names=None, no_list=False, sep=None):
         res = {}
 
         if fields is None and properties is None and formulas is None:
@@ -98,12 +109,12 @@ class Document(handle.NotesHandle):
 
         if fields:
             for field in fields if not isinstance(fields, str) and isinstance(fields, Iterable) else [fields]:
-                res[field] = self.GetItemValue(field, as_text, sep)
+                res[field] = self.GetItemValue(field, no_list, sep)
 
         if properties:
             for prop in properties if not isinstance(properties, str) and isinstance(properties, Iterable) else [properties]:
-                value = getattr(self, prop)
-                if as_text:
+                value = getattr(self.notes_property, prop)
+                if sep:
                     value = utils.item_value_to_str(value)
                 res[prop] = value
 
@@ -118,10 +129,20 @@ class Document(handle.NotesHandle):
                 formulas = formulas.formulas
 
             for formula, name in zip(formulas, formulas_names) if not isinstance(formulas, str) and isinstance(formulas, Iterable) else zip([formulas], [formulas_names]):
-                res[name] = utils.evaluate(formula, self.handle, as_text, sep)
+                res[name] = utils.evaluate(formula, self.handle, no_list, sep)
 
         return res
 
-    def toJSON(self, fields=None, properties=None, formulas=None, formulas_names=None, as_text=False, sep=", ", default=str, sort_keys=True, indent=4):
-        values = self.GetValues(fields, properties, formulas, formulas_names, as_text, sep)
-        return json.dumps(values, default=default, sort_keys=sort_keys, indent=indent)
+    def to_json(self, fields=None, properties=None, formulas=None, formulas_names=None, no_list=True, sep=None, default=str, sort_keys=True, indent=4):
+        values = self.GetValues(fields, properties, formulas, formulas_names, no_list, sep)
+        return utils.to_json(values, default, sort_keys, indent)
+
+    def save_to_json(self, fp, fields=None, properties=None, formulas=None, formulas_names=None, no_list=True, sep=None, default=str, sort_keys=True, indent=4):
+        values = self.GetValues(fields, properties, formulas, formulas_names, no_list, sep)
+        utils.save_to_json(values, fp, default, sort_keys, indent)
+
+
+    def GetValuesT(self, fields):
+        return tuple(zip(*[self.GetItemValue(field) for field in fields]))
+
+
