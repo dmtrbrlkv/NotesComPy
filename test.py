@@ -38,12 +38,15 @@ def update_person(doc):
 
     return cc.to_json("UNID")
 
-s = session.Session("bdoolo87")
+s = session.Session("")
 print(s.UserName)
 print(s.notes_property.isonserver)
 
-db = database.Database.OpenDatabase('PyLN', 'itcrowd.nsf')
+db = session.open_database('PyLN', 'itcrowd.nsf')
 print(db)
+
+# db = session.open_database('PyLN', 'itcrowd.nsf', 'Python', 'python')
+# print(db)
 
 all_docs = db.AllDocuments
 for doc in all_docs:

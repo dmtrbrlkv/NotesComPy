@@ -1,4 +1,4 @@
-from . import handle
+from . import handle, database
 import win32com.client
 
 
@@ -6,6 +6,31 @@ class SessionType:
     LotusNotesSession = "Lotus.NotesSession"
     NotesNotesSession = "Notes.NotesSession"
     Types = [LotusNotesSession, NotesNotesSession]
+
+
+class UserSession(handle.NotesHandle):
+    is_init = False
+
+    def __init__(self, username, password):
+        super().__init__(None)
+        self.session_type = SessionType.LotusNotesSession
+        handle = win32com.client.Dispatch(self.session_type)
+        self.handle = handle
+        handle.InitializeUsingNotesUserName(username, password)
+        Session.is_init = True
+
+    @property
+    def username(self):
+        return self.handle.username
+
+    UserName = username
+
+    @property
+    def _session_type(self):
+        return self.session_type
+
+    def __str__(self):
+        return self.username if self.handle else "Not initialized"
 
 
 class SingletonMeta(type):
@@ -37,16 +62,30 @@ class Session(handle.NotesHandle, metaclass=SingletonMeta):
 
         Session.is_init = True
 
-
     @property
     def username(self):
         return self.handle.username
+
     UserName = username
 
     @property
     def _session_type(self):
         return self.session_type
 
-
     def __str__(self):
         return self.username if self.handle else "Not initialized"
+
+
+def open_database(server, filepath, username=None, password=None):
+    if not username:
+        db = database.Database.OpenDatabase(server, filepath)
+    else:
+        user_session = UserSession(username, password)
+        db = database.Database.OpenDatabase(server, filepath, user_session)
+
+    return db
+
+
+
+
+

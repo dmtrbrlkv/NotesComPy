@@ -7,11 +7,14 @@ class Database(handle.NotesHandle):
 
 
     @classmethod
-    def OpenDatabase(cls, server, filepath):
-        if not session.Session.is_init:
+    def OpenDatabase(cls, server, filepath, s=None):
+        if not s:
+            s = session.Session()
+
+        if not s.is_init:
             raise RuntimeError("Session not initialized")
 
-        session_handle = session.Session().handle
+        session_handle = s.handle
         handle = session_handle.GetDatabase(server, filepath)
         return Database(handle)
 
@@ -61,13 +64,16 @@ class Database(handle.NotesHandle):
 
     def get_document_by_unid(self, unid):
         doc_handle = self.handle.GetDocumentByUNID(unid)
-        doc = document.Document(doc_handle)
-        return doc
+        if not doc_handle:
+            return None
+        return document.Document(doc_handle)
 
     GetDocumentByUNID = get_document_by_unid
 
     def get_view(self, view_name):
         view_handle = self.handle.GetView(view_name)
+        if not view_handle:
+            return None
         return view.View(view_handle)
 
     GetView = get_view
