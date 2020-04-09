@@ -8,10 +8,13 @@ import json
 def get_config():
     ap = ArgumentParser()
     ap.add_argument("-c", "--config", action="store", default="config.json")
+    ap.add_argument("-p", "--password", action="store", default="")
 
     options = ap.parse_args()
     with open(options.config) as cf:
         config = json.load(cf)
+    if options.password:
+        config["password"] = options.password
     return config
 
 def check_method(dbname, method, databases):
