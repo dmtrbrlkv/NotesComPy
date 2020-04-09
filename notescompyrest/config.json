@@ -19,21 +19,6 @@
             "doc_info": {
                 "fields": false
             }
-        },
-
-        "itcrowd":{
-            "filepath": "itcrowd.nsf",
-            "server": "PyLN",
-            "methods": {
-                "view": {"PersonsByLanguages": "Persons\\By language", "Levels": "Levels"},
-                "search": true,
-                "document": true
-            },
-            "doc_info": {
-                "fields": true,
-                "properties": true,
-                "formulas": true
-            }
         }
     }
 }

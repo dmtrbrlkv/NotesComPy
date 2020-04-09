@@ -4,6 +4,7 @@ import utils
 
 app, config, base_url, databases, separator = utils.init()
 
+app.logger.info(f"Start with config: {config}")
 
 @app.route(base_url + '/')
 def index():

@@ -71,4 +71,6 @@ def init():
     logging.basicConfig(filename=config["log"], level=logging.INFO if not config["debug"] else logging.DEBUG,
                         format=config["log_format"], datefmt=config["log_date"])
 
+    if "password" in config:
+        del config["password"]
     return app, config, base_url, databases, separator
