@@ -1,11 +1,11 @@
 from . import handle, database
 import win32com.client
+import enum
 
 
-class SessionType:
+class SessionType(enum.Enum):
     LotusNotesSession = "Lotus.NotesSession"
     NotesNotesSession = "Notes.NotesSession"
-    Types = [LotusNotesSession, NotesNotesSession]
 
 
 class UserSession(handle.NotesHandle):
@@ -49,10 +49,11 @@ class Session(handle.NotesHandle, metaclass=SingletonMeta):
         super().__init__(None)
         self.session_type = session_type
 
-        if session_type not in SessionType.Types:
-            raise ValueError(f"Unknown session type {session_type}")
+        if isinstance(session_type, SessionType):
+            handle = win32com.client.Dispatch(session_type.value)
+        else:
+            handle = win32com.client.Dispatch(session_type)
 
-        handle = win32com.client.Dispatch(session_type)
         self.handle = handle
 
         if not password is None:

@@ -1,7 +1,7 @@
 from notescompy import session, database, document, view, custom_collection
 from notescompy.utils import evaluate
 import time, datetime
-
+import os
 
 def update_person(doc):
     unid = doc.GetItemValue0("unid")
@@ -38,7 +38,7 @@ def update_person(doc):
 
     return cc.to_json("UNID")
 
-s = session.Session("")
+s = session.Session(os.environ.get("LN_PASS"))
 print(s.UserName)
 print(s.notes_property.isonserver)
 

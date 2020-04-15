@@ -1,4 +1,4 @@
-from . import handle, session, view, document, collection, agent, const
+from . import handle, session, view, document, collection, agent, const, acl
 
 
 class Database(handle.NotesHandle):
@@ -89,6 +89,12 @@ class Database(handle.NotesHandle):
 
     def create_document(self):
         return document.Document(self.handle.CreateDocument())
+
+
+    @property
+    def acl(self):
+        acl_handle = self.handle.ACL
+        return acl.ACL(acl_handle)
 
 
     def __str__(self):
