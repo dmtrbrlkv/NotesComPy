@@ -59,7 +59,8 @@ class Session(handle.NotesHandle, metaclass=SingletonMeta):
         if not password is None:
             handle.initialize(password)
         else:
-            handle.initialize()
+            # handle.initialize
+            pass
 
         Session.is_init = True
 
@@ -87,6 +88,7 @@ def open_database(server, filepath, username=None, password=None):
     return db
 
 
-
+def init_session(password, session_type=SessionType.LotusNotesSession):
+    return Session(password, session_type)
 
 

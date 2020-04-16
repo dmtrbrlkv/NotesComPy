@@ -62,9 +62,9 @@ def view(dbname, viewname):
         except:
             app.logger.exception(" * Bad request")
             return f"Bad request, check keys", 400
-        data = col.GetValues(fields=fields, properties=properties, formulas=formulas)
+        data = col.get_values(fields=fields, properties=properties, formulas=formulas)
     else:
-        data = view.GetValues()
+        data = view.get_values()
 
     return jsonify(data)
 
@@ -96,7 +96,7 @@ def search(dbname):
     fields, properties, formulas = utils.get_FPF(dbname, request.headers, databases, separator)
 
     try:
-        data = col.GetValues(fields=fields, properties=properties, formulas=formulas)
+        data = col.get_values(fields=fields, properties=properties, formulas=formulas)
         return jsonify(data)
     except:
         app.logger.exception(" * Bad request")
@@ -122,7 +122,7 @@ def document(dbname, doc_id):
         fields, properties, formulas = utils.get_FPF(dbname, request.headers, databases, separator)
 
         try:
-            data = doc.GetValues(fields=fields, properties=properties, formulas=formulas)
+            data = doc.get_values(fields=fields, properties=properties, formulas=formulas)
             return jsonify(data)
         except:
             app.logger.exception(" * Bad request")

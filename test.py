@@ -24,7 +24,7 @@ def update_person(doc):
     for person_doc in view.GetAllDocumentsByKey(unid):
         field_value = []
 
-        for field_v, field_unid in person_doc.GetValuesT([field_name, field_unid_name]):
+        for field_v, field_unid in person_doc.get_values_t([field_name, field_unid_name]):
             if field_unid == unid:
                 field_value.append(new_value)
             else:
@@ -38,7 +38,7 @@ def update_person(doc):
 
     return cc.to_json("UNID")
 
-s = session.Session(os.environ.get("LN_PASS"))
+s = session.Session("python")
 print(s.UserName)
 print(s.notes_property.isonserver)
 
@@ -129,7 +129,7 @@ cc.append(col)
 cc.append(doc)
 
 for doc in cc:
-    print(doc.GetValuesT(["Form", "UNID"]))
+    print(doc.get_values_t(["Form", "UNID"]))
 
 cc.append(db.create_document())
 cc.stamp_all("test1", "ok")
@@ -143,7 +143,7 @@ cc.append(col)
 cc.append(doc)
 
 for doc in cc:
-    print(doc.GetValuesT(["Form", "UNID"]))
+    print(doc.get_values_t(["Form", "UNID"]))
 
 
 cc.save_to_json("custom.json", ["Form", "UNID"])

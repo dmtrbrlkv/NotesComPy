@@ -98,23 +98,109 @@ print(doc.get_item_value("Form"))
 ````
 > ['Person']
 
-Как вы могли заметить, наименование методов слегка не привычно, в LotusScript мы привыкли к doc.GetItemValue, однако это не соответствует требованиям PEP8. Тем не менее реализована возможносты обращаться к методам и свойстам с привычными наименованиями.
+Как вы могли заметить, наименование методов слегка не привычно, в LotusScript мы привыкли к `doc.GetItemValue`, однако это не соответствует требованиям PEP8. Тем не менее реализована возможносты обращаться к методам и свойстам с привычными наименованиями.
 Посмотрим значение поля Level LotusScript-стиле
 ```
 print(doc.GetItemValue("Level"))
 ```
 > ['Senior']
 
-Как известно, GetItemValue возвращает массив значений (список в Python), даже если значение в поле одно и мы постоянно берем от него нулевое значение
+Как известно, `GetItemValue` возвращает массив значений (список в Python), даже если значение в поле одно и мы постоянно берем от него нулевое значение
 ```
 print(doc.get_item_value("Level")[0])
 ```
 > Senior
 
-Но это же Python, должен быть сахар и это метод get_item_value0
+Но это же Python, должен быть сахар и это метод `get_item_value0`
 ```
 print(doc.get_item_value0("Level"))
 ```
 > Senior
 
-В обоих случаях возвращается не список, а строка
+В обоих случаях возвращается не список, а строка.
+
+Создадим новый документ в сравочнике языков:
+```
+lang_doc = db.create_document()
+lang_doc.replace_item_value("Form", "Language")
+lang_doc.replace_item_value("Name", "Go")
+lang_doc.replace_item_value("Description", "Go is an open source programming language that makes it easy to build simple, reliable, and efficient software")
+```
+На форме есть вычисляемое поле UNID, поэтому вызовим метод `compute_with_form`:
+```
+lang_doc.compute_with_form()
+```
+и сохраним (обычно мы сохраняем `doc.Save(True, False)`, поэтому эти значения заданы по умолчанию и их можно опустить):
+```
+lang_doc.save()
+```
+В базе появился новый документ:
+![Go](img/go.png)
+
+
+Часто, при получении значений из документа, нужно не одно поле, а сразу несколько, а иногда и какие-то свойства документа или результаты вычисления формул. Для этого можно применить метод `get_values`, который вернет все значения как словарь:
+
+```
+values = lang_doc.get_values(["Form", "Name"], "Universalid", "@created", "Дата создания")
+print(values)
+```
+> {'Form': ['Language'], 'Name': ['Go'], 'Universalid': 'C56A8822BD4C0FF54325854C00536CCE', 'Дата создания': [datetime.datetime(2020, 4, 16, 18, 11, 13)]}
+
+А когда нам не нужны списки, можно вернут значения в виде еденичных значений, передав параметр `no_list=True`:
+
+```
+values = lang_doc.get_values(["Form", "Name"], "Universalid", "@created", "Дата создания", no_list=True)
+print(values)
+```
+> {'Form': 'Language', 'Name': 'Go', 'Universalid': 'C56A8822BD4C0FF54325854C00536CCE', 'Дата создания': datetime.datetime(2020, 4, 16, 18, 11, 13)}
+
+#### Представления
+Получим представление с уровнями:
+```
+from notescompy import init_session, open_database
+s = init_session("python")
+db = open_database('PyLN', 'itcrowd.nsf')
+view = db.get_view("Levels")
+```
+
+Проитерируемся по представлению в LS-стиле:
+```
+doc = view.get_first_document()
+while doc:
+    print(doc.universal_id)
+    doc = view.get_next_document()
+```
+
+Также представление поддерживает питоновский протокол итерации:
+```
+for doc in view:
+    print(doc.universal_id)
+```
+
+В обоих случая получим униды всех документов в представлении:
+> 8C5A8BCE0F3666A84325854100363E5D
+38187A89713365CB4325854100363BF7
+0FB66AA59EAE2A0B43258541003638ED
+
+Второй из наиболее используемых методов работы с представлением - это отбор документов по ключу. Возьмем представления с сотрудниками, отсортированное по униду уровня, и отберем всех, знающих Python (унид справочника - 3F1B416909DE674043258541003445AA)
+
+```
+view = db.get_view("srchPersonsByLanguage")
+col = view.get_all_documents_by_key("3F1B416909DE674043258541003445AA")
+print(col.count)
+```
+> 3
+
+Получили коллекцию из трех документов.
+
+
+Если нам нужны значения все документов прдставления в том виде, как они отображаются в представлении, то можно воспользоваться методом `get_values`. Возьмем представление с сотрудниками, значения получим как строки, а для объединения мультизначных полей будет использовать / 
+![Сотрудники](img/view_values.png)
+```
+view = db.get_view("Persons")
+values = view.get_values(no_list=True, sep= "/")
+print(values)
+```
+> {'F219AA2C843B6DD743258541003C1E99': {'Full name': 'Bill G', 'Level': 'Senior', 'Languages': 'C++', 'Phone': ''}, 'A5426F32DBE6B94143258541003C40CE': {'Full name': 'Gena O Possum', 'Level': 'Junior', 'Languages': 'Python', 'Phone': ''}, '9A899214038E229843258541003BFFDB': {'Full name': 'Ivan Kuznetsov', 'Level': 'Senior', 'Languages': 'Java/Python/C++', 'Phone': ''}, 'DFBCDDFEE3D0764C432585410046CFFE': {'Full name': 'John Cena', 'Level': 'Senior', 'Languages': '', 'Phone': '+7 777 777 77 77'}, '45A4A1F61B47769443258541003609B3': {'Full name': 'John Smith', 'Level': 'Middle', 'Languages': 'Python', 'Phone': ''}}
+
+#### Коллекции

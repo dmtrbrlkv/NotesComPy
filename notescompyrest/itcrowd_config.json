@@ -1,0 +1,39 @@
+{
+    "global_session": true,
+    "password": "",
+    "url": "/notes",
+    "separator": "##",
+    "log": null,
+    "log_format": "[%(asctime)s] %(levelname).1s %(message)s",
+    "log_date": "%Y.%m.%d %H:%M:%S",
+    "debug": true,
+    "databases": {
+        "names":{
+            "filepath": "names.nsf",
+            "server": "PyLN",
+            "methods": {
+                "view": {"People": "People"},
+                "search": false,
+                "document": false
+            },
+            "doc_info": {
+                "fields": false
+            }
+        },
+
+        "itcrowd":{
+            "filepath": "itcrowd.nsf",
+            "server": "PyLN",
+            "methods": {
+                "view": {"PersonsByLanguages": "Persons\\By language", "Levels": "Levels"},
+                "search": true,
+                "document": true
+            },
+            "doc_info": {
+                "fields": true,
+                "properties": true,
+                "formulas": true
+            }
+        }
+    }
+}

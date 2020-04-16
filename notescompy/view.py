@@ -44,8 +44,7 @@ class View(handle.NotesHandle, iterdoc.IterDocMixin):
     def __str__(self):
         return f"View {self.name}, {self.entry_count} entries"
 
-
-    def GetValues(self, no_list=False, sep=None):
+    def get_values(self, no_list=False, sep=None):
         res = {}
 
         fields = None
@@ -54,17 +53,18 @@ class View(handle.NotesHandle, iterdoc.IterDocMixin):
         formulas_names = self.titles
 
         for doc in self:
-            doc_res = doc.GetValues(fields, properties, formulas, formulas_names, no_list, sep)
+            doc_res = doc.get_values(fields, properties, formulas, formulas_names, no_list, sep)
             res[doc.UniversalID] = doc_res
 
         return res
 
+
     def to_json(self, no_list=True, sep=None, default=str, sort_keys=True, indent=4):
-        values = self.GetValues(no_list, sep)
+        values = self.get_values(no_list, sep)
         return utils.to_json(values, default, sort_keys, indent)
 
     def save_to_json(self, fp, no_list=True, sep=None, default=str, sort_keys=True, indent=4):
-        values = self.GetValues(no_list, sep)
+        values = self.get_values(no_list, sep)
         utils.save_to_json(values, fp, default, sort_keys, indent)
 
     @property

@@ -48,7 +48,7 @@ class Database(handle.NotesHandle):
     @property
     def size(self):
         return self.handle.Size
-    size = size
+    Size = size
 
     @property
     def title(self):
@@ -59,7 +59,6 @@ class Database(handle.NotesHandle):
         doc_handle = self.handle.GetDocumentByID(note_id)
         doc = document.Document(doc_handle)
         return doc
-
     GetDocumentByID = get_document_by_id
 
     def get_document_by_unid(self, unid):
@@ -67,7 +66,6 @@ class Database(handle.NotesHandle):
         if not doc_handle:
             return None
         return document.Document(doc_handle)
-
     GetDocumentByUNID = get_document_by_unid
 
     def get_view(self, view_name):
@@ -75,27 +73,27 @@ class Database(handle.NotesHandle):
         if not view_handle:
             return None
         return view.View(view_handle)
-
     GetView = get_view
-
 
     def get_agent(self, agent_name):
         agent_handle = self.handle.GetAgent(agent_name)
         return agent.Agent(agent_handle)
+    GetAgent = get_agent
 
     def search(self, formula, notesDateTime=const.nothing, maxDocs=0):
         col_handle = self.handle.search(formula, notesDateTime, maxDocs)
         return collection.DocumentCollection(col_handle)
+    Search = search
 
     def create_document(self):
         return document.Document(self.handle.CreateDocument())
-
+    CreateDocument = create_document
 
     @property
     def acl(self):
         acl_handle = self.handle.ACL
         return acl.ACL(acl_handle)
-
+    ACL = acl
 
     def __str__(self):
         return f"{self.title} ({self.server} {self.file_path})" if self.is_open else "Not open"

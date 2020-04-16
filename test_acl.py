@@ -1,9 +1,11 @@
 import os
-from notescompy import session
+from notescompy import init_session, open_database
 
 
-s = session.Session(os.environ.get("LN_PASS"))
-db = session.open_database('PyLN', 'itcrowd.nsf')
+s = init_session("python")
+print(s.UserName)
+
+db = open_database('PyLN', 'itcrowd.nsf')
 
 acl = db.acl
 

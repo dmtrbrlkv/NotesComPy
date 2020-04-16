@@ -1,7 +1,7 @@
 from notescompy import session, log
 import os
 
-s = session.Session(os.environ.get("LN_PASS"))
+s = session.Session("python")
 logdb = session.open_database('PyLN', 'dblog.nsf')
 
 l = log.NotesLog(logdb, "Test log by python", log.LogLevel.DEBUG)

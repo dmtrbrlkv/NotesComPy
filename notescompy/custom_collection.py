@@ -53,7 +53,7 @@ class CustomCollection():
         res = {}
 
         for doc in self:
-            doc_res = doc.GetValues(fields, properties, formulas, formulas_names, no_list, sep)
+            doc_res = doc.get_values(fields, properties, formulas, formulas_names, no_list, sep)
             res[doc.UniversalID] = doc_res
 
         return res
