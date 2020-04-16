@@ -126,7 +126,7 @@ lang_doc.replace_item_value("Form", "Language")
 lang_doc.replace_item_value("Name", "Go")
 lang_doc.replace_item_value("Description", "Go is an open source programming language that makes it easy to build simple, reliable, and efficient software")
 ```
-На форме есть вычисляемое поле UNID, поэтому вызовим метод `compute_with_form`:
+На форме есть вычисляемое поле UNID, поэтому вызовем метод `compute_with_form`:
 ```
 lang_doc.compute_with_form()
 ```
