@@ -32,8 +32,7 @@ class Log(handle.NotesHandle):
         self.log(msg, True, errNo)
 
 
-
-def FileLog(fp, programName=None, level=LogLevel.INFO, overwrite=False):
+def file_log(fp, programName=None, level=LogLevel.INFO, overwrite=False):
     if programName is None:
         programName = ""
     log_handle = session.Session().notes_property.CreateLog(programName)
@@ -44,7 +43,7 @@ def FileLog(fp, programName=None, level=LogLevel.INFO, overwrite=False):
     return log
 
 
-def NotesLog(db, programName=None, level=LogLevel.INFO):
+def notes_log(db, programName=None, level=LogLevel.INFO):
     if programName is None:
         programName = ""
 

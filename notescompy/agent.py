@@ -9,7 +9,7 @@ class Agent(handle.NotesHandle):
     def __str__(self):
         return f"{self.handle.Name} from {self.handle.Parent.FilePath}"
 
-    def Run(self, doc=None):
+    def run(self, doc=None):
         if isinstance(doc, str):
             noteid = doc
         elif isinstance(doc, document.Document):
@@ -21,6 +21,7 @@ class Agent(handle.NotesHandle):
             return self.handle.Run(noteid)
         else:
             return self.handle.Run()
+    Run = run
 
     def RunOnServer(self, doc=None):
         if isinstance(doc, str):

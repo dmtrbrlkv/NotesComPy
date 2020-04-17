@@ -1,4 +1,4 @@
-from . import handle, utils
+from . import handle, utils, iterdoc
 import enum
 
 class ACLLevel(enum.IntEnum):
@@ -266,7 +266,7 @@ class ACLEntry(handle.NotesHandle):
         return ", ".join(res)
 
 
-    def GetValues(self, asStr):
+    def get_values(self, asStr):
         values = {
             "Name": self.Name,
             "UserType": str(self.UserType) if asStr else self.UserType,
@@ -276,20 +276,18 @@ class ACLEntry(handle.NotesHandle):
         return values
 
     def to_json(self, asStr=False, default=str, sort_keys=True, indent=4):
-        values = self.GetValues(asStr)
+        values = self.get_values(asStr)
         return utils.to_json(values, default, sort_keys, indent)
 
     def save_to_json(self, fp, asStr=False, default=str, sort_keys=True, indent=4):
-        values = self.GetValues(asStr)
+        values = self.get_values(asStr)
         utils.save_to_json(values, fp, default, sort_keys, indent)
 
 
-
-class ACL(handle.NotesHandle):
+class ACL(handle.NotesHandle, iterdoc.IterDocMixin):
     def __init__(self, handle):
         super().__init__(handle)
-
-        self._current_entry = None
+        iterdoc.IterDocMixin.__init__(self, "GetFirstEntry:get_first_entry", "GetNextEntry:get_next_entry", ACLEntry)
 
 
     @property
@@ -333,42 +331,16 @@ class ACL(handle.NotesHandle):
         self.handle.Save()
 
 
-    def get_first_entry(self):
-        iterator = iter(self)
-        return next(iterator)
-
-    def get_next_entry(self):
-        try:
-            return next(self)
-        except StopIteration:
-            return None
-
-    def __iter__(self):
-        self._current_entry = None
-        return self
-
-    def __next__(self):
-        if not self._current_entry:
-            entry_handle = self.handle.getFirstEntry()
-        else:
-            entry_handle = self.handle.getNextEntry(self._current_entry.handle)
-        if not entry_handle:
-            self._current_entry = None
-            raise StopIteration
-        self._current_entry = ACLEntry(entry_handle)
-        return self._current_entry
-
-
-    def GetValues(self, asStr=False):
+    def get_values(self, asStr=False):
         values = {
-            entry.Name: entry.GetValues(asStr) for entry in self
+            entry.Name: entry.get_values(asStr) for entry in self
         }
         return values
 
     def to_json(self, asStr=False, default=str, sort_keys=True, indent=4):
-        values = self.GetValues(asStr)
+        values = self.get_values(asStr)
         return utils.to_json(values, default, sort_keys, indent)
 
     def save_to_json(self, fp, asStr=False, default=str, sort_keys=True, indent=4):
-        values = self.GetValues(asStr)
+        values = self.get_values(asStr)
         utils.save_to_json(values, fp, default, sort_keys, indent)

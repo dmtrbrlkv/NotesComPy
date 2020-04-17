@@ -18,5 +18,5 @@ col = view.get_all_documents_by_key("3F1B416909DE674043258541003445AA")
 print(col.count)
 
 view = db.get_view("Persons")
-values = view.get_values(no_list=True, sep= "/")
+values = view.get_values(no_list=True, sep="/")
 print(values)

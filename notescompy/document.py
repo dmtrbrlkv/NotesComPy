@@ -123,7 +123,8 @@ class Document(handle.NotesHandle):
         if fields is None and properties is None and formulas is None:
             fields = []
             for item in self.Items:
-                fields.append(item.Name)
+                if not item.Name.startswith("$"):
+                    fields.append(item.Name)
             properties = ["UniversalId", "Created"]
 
         if fields:
@@ -133,6 +134,7 @@ class Document(handle.NotesHandle):
         if properties:
             for prop in properties if not isinstance(properties, str) and isinstance(properties, Iterable) else [properties]:
                 value = getattr(self.notes_property, prop)
+                value = utils.convert_item_value(value)
                 if sep:
                     value = utils.item_value_to_str(value)
                 res[prop] = value
@@ -160,7 +162,7 @@ class Document(handle.NotesHandle):
         values = self.get_values(fields, properties, formulas, formulas_names, no_list, sep)
         utils.save_to_json(values, fp, default, sort_keys, indent)
 
-    def get_values_t(self, fields):
+    def get_values_t(self, *fields):
         return tuple(zip(*[self.GetItemValue(field) for field in fields]))
 
     def copy(self, db=None, from_disk=False):
@@ -200,4 +202,6 @@ class Document(handle.NotesHandle):
         backup.copy_all_items(self, True)
 
 
+    def __eq__(self, other):
+        return self.parent_database.file_path + self.universal_id == other.parent_database.file_path + other.universal_id
 

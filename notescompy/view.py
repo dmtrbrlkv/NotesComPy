@@ -4,7 +4,7 @@ from . import handle, iterdoc, document, collection, utils
 class View(handle.NotesHandle, iterdoc.IterDocMixin):
     def __init__(self, handle):
         super().__init__(handle)
-        super(iterdoc.IterDocMixin).__init__()
+        iterdoc.IterDocMixin.__init__(self)
 
     def get_all_documents_by_key(self, keys, exact_match=False):
         col_handle = self.handle.GetAllDocumentsByKey(keys, exact_match)

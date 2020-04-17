@@ -1,4 +1,4 @@
-from notescompy import session, database, document, view, custom_collection
+from notescompy import session, database, document, view, extended_collection
 from notescompy.utils import evaluate
 import time, datetime
 import os
@@ -6,7 +6,7 @@ import os
 def update_person(doc):
     unid = doc.GetItemValue0("unid")
     db = doc.ParentDatabase
-    cc = custom_collection.CustomCollection(True)
+    cc = extended_collection.ExtendedCollection(True)
 
     if doc.GetItemValue0("Form") == "Language":
         view = db.get_view("srchPersonsByLanguage")
@@ -122,7 +122,7 @@ col = db.search("@contains(FullName; 'John')")
 col.save_to_json("col_search.json", formulas=v, formulas_names=v)
 
 
-cc = custom_collection.CustomCollection()
+cc = extended_collection.ExtendedCollection()
 
 cc.append(v)
 cc.append(col)
@@ -136,7 +136,7 @@ cc.stamp_all("test1", "ok")
 # cc.save()
 
 
-cc = custom_collection.CustomCollection(True)
+cc = extended_collection.ExtendedCollection(True)
 
 cc.append(v)
 cc.append(col)
@@ -149,7 +149,7 @@ for doc in cc:
 cc.save_to_json("custom.json", ["Form", "UNID"])
 
 
-cc = custom_collection.CustomCollection()
+cc = extended_collection.ExtendedCollection()
 cc.append(db.create_document())
 cc.append(db.create_document())
 cc.save()

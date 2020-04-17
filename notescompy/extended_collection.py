@@ -7,10 +7,13 @@ class SaveExeption(Exception):
         self.not_restored = not_restored
         self.not_removed = not_removed
 
-class CustomCollection():
-    def __init__(self, expanded=False):
+
+class ExtendedCollection:
+    def __init__(self, docs=None, expanded=False):
         self._col = []
         self.expanded = expanded
+        if docs is not None:
+            self.append(docs)
 
     def __str__(self):
         return f"{self.count} documents"
@@ -31,7 +34,7 @@ class CustomCollection():
         for obj in self._col:
             if isinstance(obj, document.Document):
                 yield obj
-            if isinstance(obj, (collection.DocumentCollection, view.View)):
+            if isinstance(obj, (collection.DocumentCollection, view.View, ExtendedCollection)):
                 for doc in obj:
                     yield doc
 
@@ -40,16 +43,22 @@ class CustomCollection():
         if self.expanded:
             if isinstance(obj, document.Document):
                 self._col.append(obj)
-            if isinstance(obj, (collection.DocumentCollection, view.View)):
+            if isinstance(obj, (collection.DocumentCollection, view.View, ExtendedCollection)):
                 self._col.extend(obj)
         else:
             self._col.append(obj)
 
     def remove(self, obj):
-        self._col.remove(obj)
+        if not self.expanded:
+            self._expand()
 
+        if isinstance(obj, document.Document):
+            self._col.remove(obj)
+        if isinstance(obj, (collection.DocumentCollection, view.View, ExtendedCollection)):
+            for doc in obj:
+                self._col.remove(doc)
 
-    def GetValues(self, fields=None, properties=None, formulas=None, formulas_names=None, no_list=False, sep=None):
+    def get_values(self, fields=None, properties=None, formulas=None, formulas_names=None, no_list=False, sep=None):
         res = {}
 
         for doc in self:
@@ -59,11 +68,11 @@ class CustomCollection():
         return res
 
     def to_json(self, fields=None, properties=None, formulas=None, formulas_names=None, no_list=True, sep=None, default=str, sort_keys=True, indent=4):
-        values = self.GetValues(fields, properties, formulas, formulas_names, no_list, sep)
+        values = self.get_values(fields, properties, formulas, formulas_names, no_list, sep)
         return utils.to_json(values, default, sort_keys, indent)
 
     def save_to_json(self, fp, fields=None, properties=None, formulas=None, formulas_names=None, no_list=True, sep=None, default=str, sort_keys=True, indent=4):
-        values = self.GetValues(fields, properties, formulas, formulas_names, no_list, sep)
+        values = self.get_values(fields, properties, formulas, formulas_names, no_list, sep)
         utils.save_to_json(values, fp, default, sort_keys, indent)
 
     def save(self):

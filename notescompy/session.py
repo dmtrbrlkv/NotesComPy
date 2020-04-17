@@ -88,7 +88,7 @@ def open_database(server, filepath, username=None, password=None):
     return db
 
 
-def init_session(password, session_type=SessionType.LotusNotesSession):
+def init_session(password=None, session_type=SessionType.LotusNotesSession):
     return Session(password, session_type)
 
 

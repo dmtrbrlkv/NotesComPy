@@ -13,6 +13,9 @@ for entry in acl:
     print(entry.to_json())
     print(entry.to_json(True))
 
+json = acl.get_first_entry().to_json()
+entry = acl.GetFirstEntry().to_json()
+
 # acl.AddRole("TEST")
 # acl.Save()
 
