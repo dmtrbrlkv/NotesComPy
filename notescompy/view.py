@@ -37,7 +37,7 @@ class View(handle.NotesHandle, iterdoc.IterDocMixin):
 
     @property
     def name(self):
-        return self.handle.Name
+        return self.handle.name
     Name = name
 
 

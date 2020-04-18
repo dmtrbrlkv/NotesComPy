@@ -2,152 +2,152 @@ from . import handle, utils, iterdoc
 import enum
 
 class ACLLevel(enum.IntEnum):
-    ACLLEVEL_NOACCESS = 0
-    ACLLEVEL_DEPOSITOR = 1
-    ACLLEVEL_READER = 2
-    ACLLEVEL_AUTHOR = 3
-    ACLLEVEL_EDITOR = 4
-    ACLLEVEL_DESIGNER = 5
-    ACLLEVEL_MANAGER = 6
+    NOACCESS = 0
+    DEPOSITOR = 1
+    READER = 2
+    AUTHOR = 3
+    EDITOR = 4
+    DESIGNER = 5
+    MANAGER = 6
 
     def __str__(self):
-        if self == ACLLevel.ACLLEVEL_NOACCESS:
+        if self == ACLLevel.NOACCESS:
             return "No access"
-        if self == ACLLevel.ACLLEVEL_DEPOSITOR:
+        if self == ACLLevel.DEPOSITOR:
             return "Depositor"
-        if self == ACLLevel.ACLLEVEL_READER:
+        if self == ACLLevel.READER:
             return "Reader"
-        if self == ACLLevel.ACLLEVEL_AUTHOR:
+        if self == ACLLevel.AUTHOR:
             return "Author"
-        if self == ACLLevel.ACLLEVEL_EDITOR:
+        if self == ACLLevel.EDITOR:
             return "Editor"
-        if self == ACLLevel.ACLLEVEL_DESIGNER:
+        if self == ACLLevel.DESIGNER:
             return "Designer"
-        if self == ACLLevel.ACLLEVEL_MANAGER:
+        if self == ACLLevel.MANAGER:
             return "Manager"
 
 
 class UserType(enum.IntEnum):
-    ACLTYPE_UNSPECIFIED = 0
-    ACLTYPE_PERSON = 1
-    ACLTYPE_SERVER =2
-    ACLTYPE_MIXED_GROUP = 3
-    ACLTYPE_PERSON_GROUP = 4
-    ACLTYPE_SERVER_GROUP = 5
+    UNSPECIFIED = 0
+    PERSON = 1
+    SERVER =2
+    MIXED_GROUP = 3
+    PERSON_GROUP = 4
+    SERVER_GROUP = 5
 
     def __str__(self):
-        if self == UserType.ACLTYPE_UNSPECIFIED:
+        if self == UserType.UNSPECIFIED:
             return "Unspecified"
-        if self == UserType.ACLTYPE_PERSON:
+        if self == UserType.PERSON:
             return "Person"
-        if self == UserType.ACLTYPE_SERVER:
+        if self == UserType.SERVER:
             return "Server"
-        if self == UserType.ACLTYPE_MIXED_GROUP:
+        if self == UserType.MIXED_GROUP:
             return "Mixed group"
-        if self == UserType.ACLTYPE_PERSON_GROUP:
+        if self == UserType.PERSON_GROUP:
             return "Person group"
-        if self == UserType.ACLTYPE_SERVER_GROUP:
+        if self == UserType.SERVER_GROUP:
             return "Server group"
 
 class ACLRights():
-    def __init__(self, CanCreateDocuments=False, CanCreateLSOrJavaAgent=False, CanCreatePersonalAgent=False, CanCreatePersonalFolder=False,
-                 CanCreateSharedFolder=False, CanDeleteDocuments=False, CanReplicateOrCopyDocuments=False, IsPublicReader=False, IsPublicWriter=False):
-        self.CanCreateDocuments = CanCreateDocuments
-        self.CanCreateLSOrJavaAgent = CanCreateLSOrJavaAgent
-        self.CanCreatePersonalAgent = CanCreatePersonalAgent
-        self.CanCreatePersonalFolder = CanCreatePersonalFolder
-        self.CanCreateSharedFolder = CanCreateSharedFolder
-        self.CanDeleteDocuments = CanDeleteDocuments
-        self.CanReplicateOrCopyDocuments = CanReplicateOrCopyDocuments
-        self.IsPublicReader = IsPublicReader
-        self.IsPublicWriter = IsPublicWriter
+    def __init__(self, can_create_documents=False, can_create_ls_or_java_agent=False, can_create_personal_agent=False, can_create_personal_folder=False,
+                 can_create_shared_folder=False, can_delete_documents=False, can_replicate_or_copy_documents=False, is_public_reader=False, is_public_writer=False):
+        self.can_create_documents = can_create_documents
+        self.can_create_ls_or_java_agent = can_create_ls_or_java_agent
+        self.can_create_personal_agent = can_create_personal_agent
+        self.can_create_personal_folder = can_create_personal_folder
+        self.can_create_shared_folder = can_create_shared_folder
+        self.can_delete_documents = can_delete_documents
+        self.can_replicate_or_copy_documents = can_replicate_or_copy_documents
+        self.is_public_reader = is_public_reader
+        self.is_public_writer = is_public_writer
 
     @property
-    def CanCreateDocuments(self):
-        return self._CanCreateDocuments
-    @CanCreateDocuments.setter
-    def CanCreateDocuments(self, value):
-        self._CanCreateDocuments = value
+    def can_create_documents(self):
+        return self._can_create_documents
+    @can_create_documents.setter
+    def can_create_documents(self, value):
+        self._can_create_documents = value
 
     @property
-    def CanCreateLSOrJavaAgent(self):
-        return self._CanCreateLSOrJavaAgent
-    @CanCreateLSOrJavaAgent.setter
-    def CanCreateLSOrJavaAgent(self, value):
-        self._CanCreateLSOrJavaAgent = value
+    def can_create_ls_or_java_agent(self):
+        return self._can_create_ls_or_java_agent
+    @can_create_ls_or_java_agent.setter
+    def can_create_ls_or_java_agent(self, value):
+        self._can_create_ls_or_java_agent = value
 
     @property
-    def CanCreatePersonalAgent(self):
-        return self._CanCreatePersonalAgent
-    @CanCreatePersonalAgent.setter
-    def CanCreatePersonalAgent(self, value):
-        self._CanCreatePersonalAgent = value
+    def can_create_personal_agent(self):
+        return self._can_create_personal_agent
+    @can_create_personal_agent.setter
+    def can_create_personal_agent(self, value):
+        self._can_create_personal_agent = value
 
     @property
-    def CanCreatePersonalFolder(self):
-        return self._CanCreatePersonalFolder
-    @CanCreatePersonalFolder.setter
-    def CanCreatePersonalFolder(self, value):
-        self._CanCreatePersonalFolder = value
+    def can_create_personal_folder(self):
+        return self._can_create_personal_folder
+    @can_create_personal_folder.setter
+    def can_create_personal_folder(self, value):
+        self._can_create_personal_folder = value
 
     @property
-    def CanCreateSharedFolder(self):
-        return self._CanCreateSharedFolder
-    @CanCreateSharedFolder.setter
-    def CanCreateSharedFolder(self, value):
-        self._CanCreateSharedFolder = value
+    def can_create_shared_folder(self):
+        return self._can_create_shared_folder
+    @can_create_shared_folder.setter
+    def can_create_shared_folder(self, value):
+        self._can_create_shared_folder = value
 
     @property
-    def CanDeleteDocuments(self):
-        return self._CanDeleteDocuments
-    @CanDeleteDocuments.setter
-    def CanDeleteDocuments(self, value):
-        self._CanDeleteDocuments = value
+    def can_delete_documents(self):
+        return self._can_delete_documents
+    @can_delete_documents.setter
+    def can_delete_documents(self, value):
+        self._can_delete_documents = value
 
     @property
-    def CanReplicateOrCopyDocuments(self):
-        return self._CanReplicateOrCopyDocuments
-    @CanReplicateOrCopyDocuments.setter
-    def CanReplicateOrCopyDocuments(self, value):
-        self._CanReplicateOrCopyDocuments = value
+    def can_replicate_or_copy_documents(self):
+        return self._can_replicate_or_copy_documents
+    @can_replicate_or_copy_documents.setter
+    def can_replicate_or_copy_documents(self, value):
+        self._can_replicate_or_copy_documents = value
 
     @property
-    def IsPublicReader(self):
-        return self._IsPublicReader
-    @IsPublicReader.setter
-    def IsPublicReader(self, value):
-        self._IsPublicReader = value
+    def is_public_reader(self):
+        return self._is_public_reader
+    @is_public_reader.setter
+    def is_public_reader(self, value):
+        self._is_public_reader = value
 
     @property
-    def IsPublicWriter(self):
-        return self._IsPublicWriter
-    @IsPublicWriter.setter
-    def IsPublicWriter(self, value):
-        self._IsPublicWriter = value
+    def is_public_writer(self):
+        return self._is_public_writer
+    @is_public_writer.setter
+    def is_public_writer(self, value):
+        self._is_public_writer = value
 
     def __str__(self):
         res = []
 
-        if self.CanCreateDocuments:
+        if self.can_create_documents:
             res.append("Create documents")
-        if self.CanCreateLSOrJavaAgent:
+        if self.can_create_ls_or_java_agent:
             res.append("Create LotusScript/Java agents")
-        if self.CanCreatePersonalAgent:
+        if self.can_create_personal_agent:
             res.append("Create private agents")
-        if self.CanCreatePersonalFolder:
+        if self.can_create_personal_folder:
             res.append("Create personal folders/views")
-        if self.CanCreateSharedFolder:
+        if self.can_create_shared_folder:
             res.append("Create shares folders/views")
-        if self.CanDeleteDocuments:
+        if self.can_delete_documents:
             res.append("Delete documents")
-        if self.CanReplicateOrCopyDocuments:
+        if self.can_replicate_or_copy_documents:
             res.append("Replicate or copy documents")
-        if self.IsPublicReader:
+        if self.is_public_reader:
             res.append("Read public documents")
-        if self.IsPublicWriter:
+        if self.is_public_writer:
             res.append("Write public documents")
 
-        return ", ".join(res)
+        return str(res)
 
 
 class ACLEntry(handle.NotesHandle):
@@ -155,131 +155,133 @@ class ACLEntry(handle.NotesHandle):
         super().__init__(handle)
 
     @property
-    def Name(self):
+    def name(self):
         return self.handle.Name
 
-    @Name.setter
-    def Name(self, value):
+    @name.setter
+    def name(self, value):
         self.handle.Name = value
-
+    Name = name
 
     @property
-    def Roles(self):
-        return self.handle.Roles
+    def roles(self):
+        return list(self.handle.Roles)
 
-    @Roles.setter
-    def Roles(self, roles):
+    @roles.setter
+    def roles(self, roles):
         if roles is None:
-            for role in self.Roles:
+            for role in self.roles:
                 self.handle.DisableRole(role)
             return
 
         if isinstance(roles, str):
             roles = [roles]
 
-        for role in self.Roles:
+        for role in self.roles:
             self.handle.DisableRole(role)
         
         for role in roles:
             self.handle.EnableRole(role)
-
+    Roles = roles
 
     @property
-    def UserType(self):
+    def user_type(self):
         return UserType(self.handle.UserType)
-    @UserType.setter
-    def UserType(self, value):
+    @user_type.setter
+    def user_type(self, value):
         if isinstance(value, UserType):
             self.handle.UserType = value.value
         else:
             self.handle.UserType = value
+    UserType = user_type
 
     @property
-    def Level(self):
+    def level(self):
         return ACLLevel(self.handle.Level)
-    @Level.setter
-    def Level(self, value):
+    @level.setter
+    def level(self, value):
         if isinstance(value, ACLLevel):
             self.handle.Level = value.value
         else:
             self.handle.Level = value
+    Level = level
 
     @property
-    def Rights(self):
+    def rights(self):
         rights = ACLRights()
         if self.handle.CanCreateDocuments:
-            rights.CanCreateDocuments = True
+            rights.can_create_documents = True
 
         if self.handle.CanCreateLSOrJavaAgent:
-            rights.CanCreateLSOrJavaAgent = True
+            rights.can_create_ls_or_java_agent = True
 
         if self.handle.CanCreatePersonalAgent:
-            rights.CanCreatePersonalAgent = True
+            rights.can_create_personal_agent = True
 
         if self.handle.CanCreatePersonalFolder:
-            rights.CanCreatePersonalFolder = True
+            rights.can_create_personal_folder = True
 
         if self.handle.CanCreateSharedFolder:
-            rights.CanCreateSharedFolder = True
+            rights.can_create_shared_folder = True
 
         if self.handle.CanDeleteDocuments:
-            rights.CanDeleteDocuments = True
+            rights.can_delete_documents = True
 
         if self.handle.CanReplicateOrCopyDocuments:
-            rights.CanReplicateOrCopyDocuments = True
+            rights.can_replicate_or_copy_documents = True
 
         if self.handle.IsPublicReader:
-            rights.IsPublicReader = True
+            rights.is_public_reader = True
 
         if self.handle.IsPublicWriter:
-            rights.IsPublicWriter = True
+            rights.is_public_writer = True
 
         return rights
 
-    @Rights.setter
-    def Rights(self, rights):
+    @rights.setter
+    def rights(self, rights):
         if rights is None:
             rights = ACLRights()
 
-        self.handle.CanCreateDocuments = rights.CanCreateDocuments
-        self.handle.CanCreateLSOrJavaAgent = rights.CanCreateLSOrJavaAgent
-        self.handle.CanCreatePersonalAgent = rights.CanCreatePersonalAgent
-        self.handle.CanCreatePersonalFolder = rights.CanCreatePersonalFolder
-        self.handle.CanCreateSharedFolder = rights.CanCreateSharedFolder
-        self.handle.CanDeleteDocuments = rights.CanDeleteDocuments
-        self.handle.CanReplicateOrCopyDocuments = rights.CanReplicateOrCopyDocuments
-        self.handle.IsPublicReader = rights.IsPublicReader
-        self.handle.IsPublicWriter = rights.IsPublicWriter
+        self.handle.CanCreateDocuments = rights.can_create_documents
+        self.handle.CanCreateLSOrJavaAgent = rights.can_create_ls_or_java_agent
+        self.handle.CanCreatePersonalAgent = rights.can_create_personal_agent
+        self.handle.CanCreatePersonalFolder = rights.can_create_personal_folder
+        self.handle.CanCreateSharedFolder = rights.can_create_shared_folder
+        self.handle.CanDeleteDocuments = rights.can_delete_documents
+        self.handle.CanReplicateOrCopyDocuments = rights.can_replicate_or_copy_documents
+        self.handle.IsPublicReader = rights.is_public_reader
+        self.handle.IsPublicWriter = rights.is_public_writer
 
     def __str__(self):
         res = []
 
-        res.append(f"Name: {self.Name}")
-        res.append(f"User type: {str(self.UserType)}")
-        res.append(f"Level: {str(self.Level)}")
-        if self.Roles:
-            res.append(f"Roles: ({', '.join(self.Roles)})")
+        res.append(f"Name: {self.name}")
+        res.append(f"User type: {str(self.user_type)}")
+        res.append(f"Level: {str(self.level)}")
+        if self.roles:
+            res.append(f"Roles: ({', '.join(self.roles)})")
         else:
             res.append(f"Roles: -")
-        res.append(f"Rights: ({self.Rights})")
+        res.append(f"Rights: ({self.rights})")
 
         return ", ".join(res)
 
-
     def get_values(self, asStr):
         values = {
-            "Name": self.Name,
-            "UserType": str(self.UserType) if asStr else self.UserType,
-            "Level": str(self.Level) if asStr else self.Level,
-            "Roles": self.Roles
+            "Name": self.name,
+            "UserType": str(self.user_type) if asStr else self.user_type,
+            "Level": str(self.level) if asStr else self.level,
+            "Roles": self.roles,
+            "Rights": self.rights,
         }
         return values
 
-    def to_json(self, asStr=False, default=str, sort_keys=True, indent=4):
+    def to_json(self, asStr=True, default=str, sort_keys=True, indent=4):
         values = self.get_values(asStr)
         return utils.to_json(values, default, sort_keys, indent)
 
-    def save_to_json(self, fp, asStr=False, default=str, sort_keys=True, indent=4):
+    def save_to_json(self, fp, asStr=True, default=str, sort_keys=True, indent=4):
         values = self.get_values(asStr)
         utils.save_to_json(values, fp, default, sort_keys, indent)
 
@@ -291,20 +293,23 @@ class ACL(handle.NotesHandle, iterdoc.IterDocMixin):
 
 
     @property
-    def Roles(self):
+    def roles(self):
         return self.handle.Roles
+    Roles = roles
 
-    def AddRole(self, name):
+    def add_role(self, name):
         self.handle.AddRole(name)
+    AddRole =add_role
 
-    def DeleteRole(self, name):
+    def delete_role(self, name):
         self.handle.DeleteRole(name)
+    DeleteRole = delete_role
 
-    def RenameRole(self, old_name, new_name):
+    def rename_role(self, old_name, new_name):
         self.handle.RenameRole(old_name, new_name)
+    RenameRole = rename_role
 
-    def CreateACLEntry(self, name, level=ACLLevel.ACLLEVEL_NOACCESS, user_type=UserType.ACLTYPE_PERSON, roles=None, rights=None):
-
+    def create_acl_entry(self, name, level=ACLLevel.NOACCESS, user_type=UserType.PERSON, roles=None, rights=None):
         if isinstance(level, ACLLevel):
             entry_handle = self.handle.CreateACLEntry(name, level.value)
         else:
@@ -313,34 +318,38 @@ class ACL(handle.NotesHandle, iterdoc.IterDocMixin):
         entry = ACLEntry(entry_handle)
 
         if isinstance(user_type, UserType):
-            entry.UserType = user_type.value
+            entry.user_type = user_type.value
         else:
-            entry.UserType = user_type
+            entry.user_type = user_type
 
-        entry.Roles = roles
-        entry.Rights = rights
+        entry.roles = roles
+        entry.rights = rights
 
         return entry
+    CreateACLEntry = create_acl_entry
 
-
-    def RemoveACLEntry(self, name):
+    def remove_acl_entry(self, name):
         self.handle.RemoveACLEntry(name)
+    RemoveACLEntry = remove_acl_entry
 
+    def get_entry(self, name):
+        entry_handle = self.handle.GetEntry(name)
+        return ACLEntry(entry_handle)
 
-    def Save(self):
+    def save(self):
         self.handle.Save()
+    Save = save
 
-
-    def get_values(self, asStr=False):
+    def get_values(self, asStr=True):
         values = {
-            entry.Name: entry.get_values(asStr) for entry in self
+            entry.name: entry.get_values(asStr) for entry in self
         }
         return values
 
-    def to_json(self, asStr=False, default=str, sort_keys=True, indent=4):
+    def to_json(self, asStr=True, default=str, sort_keys=True, indent=4):
         values = self.get_values(asStr)
         return utils.to_json(values, default, sort_keys, indent)
 
-    def save_to_json(self, fp, asStr=False, default=str, sort_keys=True, indent=4):
+    def save_to_json(self, fp, asStr=True, default=str, sort_keys=True, indent=4):
         values = self.get_values(asStr)
         utils.save_to_json(values, fp, default, sort_keys, indent)

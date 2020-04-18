@@ -7,7 +7,7 @@ class Agent(handle.NotesHandle):
 
 
     def __str__(self):
-        return f"{self.handle.Name} from {self.handle.Parent.FilePath}"
+        return f"{self.handle.name} from {self.handle.Parent.FilePath}"
 
     def run(self, doc=None):
         if isinstance(doc, str):

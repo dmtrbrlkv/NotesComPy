@@ -92,3 +92,7 @@ def init_session(password=None, session_type=SessionType.LotusNotesSession):
     return Session(password, session_type)
 
 
+def init_current_session():
+    return Session(password=None, session_type=SessionType.NotesNotesSession)
+
+

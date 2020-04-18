@@ -123,8 +123,8 @@ class Document(handle.NotesHandle):
         if fields is None and properties is None and formulas is None:
             fields = []
             for item in self.Items:
-                if not item.Name.startswith("$"):
-                    fields.append(item.Name)
+                if not item.name.startswith("$"):
+                    fields.append(item.name)
             properties = ["UniversalId", "Created"]
 
         if fields:
