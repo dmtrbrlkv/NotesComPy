@@ -11,7 +11,7 @@ l.info("Something important")
 l.error("Scary error")
 
 try:
-    logdb.acl.DeleteRole("ROLE")
+    logdb.acl.delete_role("ROLE")
 except Exception as e:
     l.error(f"Cant delete role: {e}", 5001)
 

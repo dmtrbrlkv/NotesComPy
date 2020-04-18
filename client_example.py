@@ -1,4 +1,4 @@
-from notescompy import init_session, open_database, session, extended_collection, log
+from notescompy import init_current_session, open_database, session, extended_collection, log
 
 def update_person(doc):
     logdb = open_database('PyLN', 'dblog.nsf')
@@ -41,7 +41,7 @@ def update_person(doc):
     l.info(f"Изменено {col.count} документов")
 
 
-s = init_session(session_type=session.SessionType.NotesNotesSession)
+s = init_current_session()
 unid = s.notes_property.GetEnvironmentString("LN_UNID")
 path = s.notes_property.GetEnvironmentString("LN_FILEPATH")
 server = s.notes_property.GetEnvironmentString("LN_SERVER")

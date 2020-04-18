@@ -342,6 +342,75 @@ for doc in ext_col:
 ```
 
 #### ACL
+Получим ACL базы, посмотрим какие в нем есть роли, добавим новую роль TEST:
+```
+from notescompy import init_session, open_database
+from notescompy.acl import UserType, ACLRights, ACLLevel
+
+s = init_session("python")
+db = open_database('PyLN', 'itcrowd.nsf')
+acl = db.acl
+print(acl.roles)
+acl.AddRole("TEST")
+acl.Save()
+print(acl.roles)
+```
+> ('[HR]', '[Admin]')
+
+> ('[HR]', '[Admin]', '[TEST]')
+
+Проитерируемся по всем записям (как всегда поддерживается и LS-стиль):
+```
+for entry in acl:
+    print(entry)
+```
+
+> Name: -Default-, User type: Unspecified, Level: No access, Roles: -, Rights: ()
+
+> Name: CN=PyLN/O=PyLN, User type: Server, Level: Manager, Roles: -, Rights: (Create documents, Create LotusScript/Java agents, Create private agents, Create personal folders/views, Create shares folders/views, Delete documents, Replicate or copy documents, Read public documents, Write public documents)
+
+> Name: CN=Python/O=PyLN, User type: Person, Level: Manager, Roles: ([HR], [Admin]), Rights: (Create documents, Create LotusScript/Java agents, Create private agents, Create personal folders/views, Create shares folders/views, Delete documents, Replicate or copy documents, Read public documents, Write public documents)
+
+> Name: OtherDomainServers, User type: Server group, Level: No access, Roles: -, Rights: ()
+
+> Name: LocalDomainServers, User type: Server group, Level: Manager, Roles: -, Rights: (Create documents, Create LotusScript/Java agents, Create private agents, Create personal folders/views, Create shares folders/views, Delete documents, Replicate or copy documents, Read public documents, Write public documents)
+
+Добавим в ACL нового пользователя Test c уровнем редактора и правами на репликацию и удаление:
+```
+entry = acl.create_acl_entry("Test")
+entry.user_type = UserType.PERSON
+entry.level = ACLLevel.EDITOR
+rights = ACLRights()
+rights.can_replicate_or_copy_documents = True
+rights.can_delete_documents = True
+entry.rights = rights
+acl.save()
+```
+![Новый пользователь](img/acl_newuser.png)
+
+Для установки прав мы воспользовались вспомогательным классом ACLRights. Добавим в ACL группу разаработчиков со всеми ролями и посмотрим как можно в одну строчку установить необходимые права:
+```
+entry = acl.CreateACLEntry("Devs")
+entry.user_type = UserType.PERSON_GROUP
+entry.level = ACLLevel.DESIGNER
+entry.roles = acl.roles
+entry.rights = ACLRights(can_create_ls_or_java_agent=True, can_replicate_or_copy_documents=True)
+acl.save()
+```
+![devs](img/acl_devs.png)
+
+
+Под конец удалим пользователя Test, роль TEST переименуем, а пользователю Python добавим роль BOSS:
+```
+acl.remove_acl_entry("Test")
+acl.rename_role("TEST", "BOSS")
+entry = acl.get_entry("Python/PyLN")
+roles = entry.roles
+roles.append("BOSS")
+entry.roles = roles
+acl.save()
+```
+![Изменения](img/acl_changes.png)
 
 
 #### Логирование
@@ -378,7 +447,157 @@ Python log: 17.04.2020 19:20:47: Error (5001): Cant delete role: (-2147352567, '
 Python log: 17.04.2020 19:20:47: Done
 
 #### Импорт в JSON
+Классы Document, DocumentCollection, ExtendedCollection, View, ACLEntry, ACL поддерживают методы импорта и сохранения данных в формате JSON - `to_json` и `save_to_json`. Для Document, DocumentCollection, ExtendedCollection, View методы принимают набор полей, свойств и формул, которые необходимо выгрузить в JSON, аналогично методу get_values. ACLEntry и ACL принимают параметр asStr, в зависимоти от которого тип записи и уровень выгружаются как числовые константы или как строковое описание.
+Сохраним в файл представление Persons
+```
+from notescompy import init_session, open_database
 
+s = init_session("python")
+db = open_database('PyLN', 'itcrowd.nsf')
+
+view = db.get_view("Persons")
+
+with open("view.json", "w") as f:
+    view.save_to_json(f)
+```
+
+
+> view.json:
+
+```
+{
+    "45A4A1F61B47769443258541003609B3": {
+        "Full name": "John Smith",
+        "Languages": "Python",
+        "Level": "Middle",
+        "Phone": ""
+    },
+    "9A899214038E229843258541003BFFDB": {
+        "Full name": "Ivan Kuznetsov",
+        "Languages": [
+            "Java",
+            "Python",
+            "C++"
+        ],
+        "Level": "Senior",
+        "Phone": ""
+    },
+    "A5426F32DBE6B94143258541003C40CE": {
+        "Full name": "Gena O Possum",
+        "Languages": "Python",
+        "Level": "Junior",
+        "Phone": ""
+    },
+    "DFBCDDFEE3D0764C432585410046CFFE": {
+        "Full name": "John Cena",
+        "Languages": "",
+        "Level": "Senior",
+        "Phone": "+7 777 777 77 77"
+    },
+    "F219AA2C843B6DD743258541003C1E99": {
+        "Full name": "Bill G",
+        "Languages": "C++",
+        "Level": "Senior",
+        "Phone": ""
+    }
+}
+``` 
+
+
+Найдем все сотрудников, знающих Python и сохраним их ФИО и уровень:
+```
+view = db.get_view("srchPersonsByLanguage")
+col = view.get_all_documents_by_key("3F1B416909DE674043258541003445AA")
+with open("col.json", "w") as f:
+    col.save_to_json(f, fields=["FullName", "Level"])
+```
+
+> col.json:
+```
+{
+    "45A4A1F61B47769443258541003609B3": {
+        "FullName": "John Smith",
+        "Level": "Middle"
+    },
+    "9A899214038E229843258541003BFFDB": {
+        "FullName": "Ivan Kuznetsov",
+        "Level": "Senior"
+    },
+    "A5426F32DBE6B94143258541003C40CE": {
+        "FullName": "Gena O Possum",
+        "Level": "Junior"
+    }
+}
+```
+
+Выгрузим ACL и отправим безопасникам, пусть разбираются почему в базе такие права:
+```
+acl = db.acl
+with open("acl.json", "w") as f:
+    acl.save_to_json(f, asStr=True)
+```
+> acl.json:
+```
+{
+    "-Default-": {
+        "Level": "No access",
+        "Name": "-Default-",
+        "Rights": "[]",
+        "Roles": [],
+        "UserType": "Unspecified"
+    },
+    "CN=Dmitry/O=PyLN": {
+        "Level": "Manager",
+        "Name": "CN=Dmitry/O=PyLN",
+        "Rights": "['Create documents', 'Create LotusScript/Java agents', 'Create private agents', 'Create personal folders/views', 'Create shares folders/views', 'Delete documents', 'Replicate or copy documents', 'Read public documents', 'Write public documents']",
+        "Roles": [],
+        "UserType": "Person"
+    },
+    "CN=PyLN/O=PyLN": {
+        "Level": "Manager",
+        "Name": "CN=PyLN/O=PyLN",
+        "Rights": "['Create documents', 'Create LotusScript/Java agents', 'Create private agents', 'Create personal folders/views', 'Create shares folders/views', 'Delete documents', 'Replicate or copy documents', 'Read public documents', 'Write public documents']",
+        "Roles": [],
+        "UserType": "Server"
+    },
+    "CN=Python/O=PyLN": {
+        "Level": "Manager",
+        "Name": "CN=Python/O=PyLN",
+        "Rights": "['Create documents', 'Create LotusScript/Java agents', 'Create private agents', 'Create personal folders/views', 'Create shares folders/views', 'Delete documents', 'Replicate or copy documents', 'Read public documents', 'Write public documents']",
+        "Roles": [
+            "[HR]",
+            "[Admin]",
+            "[BOSS]"
+        ],
+        "UserType": "Person"
+    },
+    "Devs": {
+        "Level": "Designer",
+        "Name": "Devs",
+        "Rights": "['Create documents', 'Create LotusScript/Java agents', 'Create private agents', 'Create personal folders/views', 'Create shares folders/views', 'Replicate or copy documents', 'Read public documents', 'Write public documents']",
+        "Roles": [
+            "[HR]",
+            "[Admin]",
+            "[BOSS]"
+        ],
+        "UserType": "Person group"
+    },
+    "LocalDomainServers": {
+        "Level": "Manager",
+        "Name": "LocalDomainServers",
+        "Rights": "['Create documents', 'Create LotusScript/Java agents', 'Create private agents', 'Create personal folders/views', 'Create shares folders/views', 'Delete documents', 'Replicate or copy documents', 'Read public documents', 'Write public documents']",
+        "Roles": [],
+        "UserType": "Server group"
+    },
+    "OtherDomainServers": {
+        "Level": "No access",
+        "Name": "OtherDomainServers",
+        "Rights": "[]",
+        "Roles": [],
+        "UserType": "Server group"
+    }
+}
+```
 
 #### Скрипт актуализации сотрудников на Python
 Напишем на Python функцию, актуализируются сотрудников аналогично агенту. На вход передается измененный документ справочника, по представлению ищутся сотрудники, у которых указано значение измененного справочника, значение актуализируется
@@ -500,6 +719,19 @@ def update_person(doc):
 ```
 
 
+#### Доступ к нереализованным методам и свойствам
+Если необходимо воспользоваться методом или свойством, не реализованным в библиотеке, то можно использовать свойство `notes_property`
+Например, получим значение ReplicaID базы:
+
+```
+from notescompy import init_session, open_database
+s = init_session("python")
+db = open_database('PyLN', 'itcrowd.nsf')
+print(db.notes_property.ReplicaID)
+```
+> 432585410032221D
+
+
 
 #### Использование из клиента
 В клиенте Notes сделаем кнопку, вызывающую python-скрипт, и устанавливающую переменные окружения с текущим документом, сервером и базой
@@ -516,13 +748,13 @@ def update_person(doc):
 В скрипте инициализируем сессию текущей сессией клиента, получим переменные окружения и вызовем функцию обновления сотрудников
 
 ```
-from notescompy import init_session, open_database, session, extended_collection, log
+from notescompy import init_current_session, open_database, session, extended_collection, log
 
 def update_person(doc):
     ...
 
 
-s = init_session(session_type=session.SessionType.NotesNotesSession)
+s = init_current_session()
 unid = s.notes_property.GetEnvironmentString("LN_UNID")
 path = s.notes_property.GetEnvironmentString("LN_FILEPATH")
 server = s.notes_property.GetEnvironmentString("LN_SERVER")
@@ -534,19 +766,6 @@ update_person(doc)
 
 input("Готово")
 ```
-
-
-#### Доступ к нереализованным методам и свойствам
-Если необходимо воспользоваться методом или свойством, не реализованным в библиотеке, то можно использовать свойство `notes_property`
-Например, получим значение ReplicaID базы:
-
-```
-from notescompy import init_session, open_database
-s = init_session("python")
-db = open_database('PyLN', 'itcrowd.nsf')
-print(db.notes_property.ReplicaID)
-```
-> 432585410032221D
 
 
 #### Под капотом
