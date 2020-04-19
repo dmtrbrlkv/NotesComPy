@@ -99,7 +99,7 @@ print(doc.get_item_value("Form"))
 > ['Person']
 
 Как вы могли заметить, наименование методов слегка не привычно, в LotusScript мы привыкли к `doc.GetItemValue`, однако это не соответствует требованиям PEP8. Тем не менее реализована возможности обращаться к методам и свойствам с привычными наименованиями.
-Посмотрим значение поля Level LotusScript-стиле
+Посмотрим значение поля Level в LotusScript-стиле
 ```
 print(doc.GetItemValue("Level"))
 ```
@@ -119,7 +119,7 @@ print(doc.get_item_value0("Level"))
 
 В обоих случаях возвращается не список, а строка.
 
-Создадим новый документ в сравочнике языков:
+Создадим новый документ в справочнике языков:
 ```
 lang_doc = db.create_document()
 lang_doc.replace_item_value("Form", "Language")
@@ -236,7 +236,7 @@ print(col.get_values())
 print(col.get_values(formulas=persons_view, formulas_names=persons_view))
 ```
 
-В первом случае получим значение всех полей в документе, за исключением служебных (начинающихся на $) а тажке два основных свойства `UniversalId` и `Created`:
+В первом случае получим значение всех полей в документе, за исключением служебных (начинающихся на $) а также два основных свойства `UniversalId` и `Created`:
 > {'45A4A1F61B47769443258541003609B3': {'levelunid': ['38187A89713365CB4325854100363BF7'], 'languagesunid': ['3F1B416909DE674043258541003445AA'], 'Form': ['Person'], 'UNID': ['45A4A1F61B47769443258541003609B3'], 'FullName': ['John Smith'], 'Languages': ['Python'], 'Level': ['Middle'], 'test1': ['ok'], 'UniversalId': '45A4A1F61B47769443258541003609B3', 'Created': datetime.datetime(2020, 4, 5, 12, 50, 14)}, '9A899214038E229843258541003BFFDB': {'languagesunid': ['8267D1ACBF7A300243258541003552BD', '3F1B416909DE674043258541003445AA', '51AD377698E6CD2F43258541003550D3'], 'levelunid': ['0FB66AA59EAE2A0B43258541003638ED'], 'Form': ['Person'], 'UNID': ['9A899214038E229843258541003BFFDB'], 'FullName': ['Ivan Kuznetsov'], 'Languages': ['Java', 'Python', 'C++'], 'Level': ['Senior'], 'test1': ['ok'], 'UniversalId': '9A899214038E229843258541003BFFDB', 'Created': datetime.datetime(2020, 4, 5, 13, 55, 21)}, 'A5426F32DBE6B94143258541003C40CE': {'languagesunid': ['3F1B416909DE674043258541003445AA'], 'levelunid': ['8C5A8BCE0F3666A84325854100363E5D'], 'test1': ['ok'], 'Form': ['Person'], 'UNID': ['A5426F32DBE6B94143258541003C40CE'], 'FullName': ['Gena O Possum'], 'Phone': [''], 'Languages': ['Python'], 'Level': ['Junior'], 'UniversalId': 'A5426F32DBE6B94143258541003C40CE', 'Created': datetime.datetime(2020, 4, 5, 13, 58, 7)}}
 
 Во втором же из представления будут взяты все формулы колонок и их заголовков и применены к документу:
